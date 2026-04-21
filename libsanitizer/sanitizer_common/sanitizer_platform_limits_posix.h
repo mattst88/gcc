@@ -681,7 +681,7 @@ struct __sanitizer_sigaction {
 #endif
 #endif
 #endif
-#if SANITIZER_LINUX
+#if (SANITIZER_LINUX && !defined(__alpha__)) || SANITIZER_HAIKU
   void (*sa_restorer)();
 #endif
 #if defined(__mips__) && (SANITIZER_WORDSIZE == 32)
