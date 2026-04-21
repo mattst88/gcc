@@ -289,6 +289,12 @@
 #  define SANITIZER_LOONGARCH64 0
 #endif
 
+#if defined(__alpha__)
+#  define SANITIZER_ALPHA 1
+#else
+#  define SANITIZER_ALPHA 0
+#endif
+
 // By default we allow to use SizeClassAllocator64 on 64-bit platform.
 // But in some cases SizeClassAllocator64 does not work well and we need to
 // fallback to SizeClassAllocator32.
