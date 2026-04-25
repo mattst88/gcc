@@ -223,7 +223,7 @@ AC_CACHE_CHECK([assembler symbol assignment],
   [libsanitizer_cv_as_sym_assign=yes],
   [libsanitizer_cv_as_sym_assign=no])])
 if test "$libsanitizer_cv_as_sym_assign" = "yes"; then
-  as_sym_assign_defs=-DHAVE_AS_SYM_ASSIGN=1
+  as_sym_assign_defs=-DCOMPILER_RT_HAS_ASM_EQUALS_ASSIGN=1
 fi
 AC_SUBST(AS_SYM_ASSIGN_DEFS, [$as_sym_assign_defs])
 

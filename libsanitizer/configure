@@ -16750,7 +16750,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libsanitizer_cv_as_sym_assign" >&5
 $as_echo "$libsanitizer_cv_as_sym_assign" >&6; }
 if test "$libsanitizer_cv_as_sym_assign" = "yes"; then
-  as_sym_assign_defs=-DHAVE_AS_SYM_ASSIGN=1
+  as_sym_assign_defs=-DCOMPILER_RT_HAS_ASM_EQUALS_ASSIGN=1
 fi
 AS_SYM_ASSIGN_DEFS=$as_sym_assign_defs
 

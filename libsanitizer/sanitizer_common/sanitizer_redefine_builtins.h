@@ -15,14 +15,21 @@
 #    define SANITIZER_REDEFINE_BUILTINS_H
 
 // The asm hack only works with GCC and Clang.
-#if !defined(_WIN32) && !defined(_AIX) && !defined(__APPLE__) &&               \
-    defined(HAVE_AS_SYM_ASSIGN)
+#    if !defined(_WIN32) && !defined(_AIX) && !defined(__APPLE__)
 
+#      if defined(COMPILER_RT_HAS_ASM_EQUALS_ASSIGN)
+asm(R"(
+    memcpy = __sanitizer_internal_memcpy
+    memmove = __sanitizer_internal_memmove
+    memset = __sanitizer_internal_memset
+    )");
+#      elif defined(COMPILER_RT_HAS_ASM_DOT_SET)
 asm(R"(
     .set memcpy, __sanitizer_internal_memcpy
     .set memmove, __sanitizer_internal_memmove
     .set memset, __sanitizer_internal_memset
     )");
+#      endif
 
 #      if defined(__cplusplus) && \
           !defined(SANITIZER_COMMON_REDEFINE_BUILTINS_IN_STD)
