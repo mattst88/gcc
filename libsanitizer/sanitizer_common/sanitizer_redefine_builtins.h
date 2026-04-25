@@ -15,12 +15,11 @@
 #    define SANITIZER_REDEFINE_BUILTINS_H
 
 // The asm hack only works with GCC and Clang.
-#    if !defined(_WIN32) && defined(HAVE_AS_SYM_ASSIGN)
-
+#    if !defined(_WIN32) && defined(COMPILER_RT_HAS_ASM_EQUALS_ASSIGN)
 asm(R"(
-    .set memcpy, __sanitizer_internal_memcpy
-    .set memmove, __sanitizer_internal_memmove
-    .set memset, __sanitizer_internal_memset
+    memcpy = __sanitizer_internal_memcpy
+    memmove = __sanitizer_internal_memmove
+    memset = __sanitizer_internal_memset
     )");
 
 #      if defined(__cplusplus) && \
@@ -52,7 +51,7 @@ using vector = Define_SANITIZER_COMMON_NO_REDEFINE_BUILTINS_in_cpp_file;
 }  // namespace std
 
 #      endif  // __cpluplus
-#    endif    // !_WIN32 && HAVE_AS_SYM_ASSIGN
+#    endif    // !_WIN32 && COMPILER_RT_HAS_ASM_EQUALS_ASSIGN
 
 #  endif  // SANITIZER_REDEFINE_BUILTINS_H
 #endif    // SANITIZER_COMMON_NO_REDEFINE_BUILTINS
