@@ -1682,8 +1682,13 @@ process_options ()
 
   /* Address Sanitizer needs porting to each target architecture.  */
 
+  /* Targets that define TARGET_ASAN_SHADOW_OFFSET explicitly declare
+     ASan support and are allowed through even if FRAME_GROWS_DOWNWARD is
+     not set; in that case stack-variable instrumentation uses the else
+     branch in asan.cc rather than the FRAME_GROWS_DOWNWARD branch.  */
   if ((flag_sanitize & SANITIZE_ADDRESS)
-      && !FRAME_GROWS_DOWNWARD)
+      && !FRAME_GROWS_DOWNWARD
+      && targetm.asan_shadow_offset == NULL)
     {
       warning_at (UNKNOWN_LOCATION, 0,
 		  "%<-fsanitize=address%> and %<-fsanitize=kernel-address%> "
