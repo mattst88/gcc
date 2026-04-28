@@ -82,7 +82,7 @@
 #    include <sys/personality.h>
 #  endif
 
-#  if SANITIZER_LINUX && defined(__loongarch__)
+#  if SANITIZER_LINUX && (defined(__loongarch__) || defined(__alpha__))
 #    include <sys/sysmacros.h>
 #  endif
 
