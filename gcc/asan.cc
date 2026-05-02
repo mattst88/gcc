@@ -1967,8 +1967,12 @@ asan_emit_stack_protection (rtx base, rtx pbase, unsigned int alignb,
     }
   str_cst = asan_pp_string (&asan_pp);
 
-  gcc_checking_assert (offsets[0] == (crtl->stack_protect_guard
-				      ? -ASAN_RED_ZONE_SIZE : 0));
+  /* For FRAME_GROWS_DOWNWARD, offsets[0] is the frame-pointer boundary
+     (0 or -ASAN_RED_ZONE_SIZE with stack protector).  For !FRAME_GROWS_DOWNWARD
+     offsets[0] is outer_end (a positive value), so skip the check.  */
+  if (FRAME_GROWS_DOWNWARD)
+    gcc_checking_assert (offsets[0] == (crtl->stack_protect_guard
+					? -ASAN_RED_ZONE_SIZE : 0));
   /* Emit the prologue sequence.  */
   if (asan_frame_size > 32 && asan_frame_size <= 65536 && pbase
       && param_asan_use_after_return)

@@ -2685,6 +2685,41 @@ expand_used_vars (bitmap forced_stack_vars)
 				      << ASAN_SHADOW_SHIFT)
 				     / BITS_PER_UNIT, 1);
 
+	  /* For targets where the frame grows upward (FRAME_GROWS_DOWNWARD == 0),
+	     asan_vec is built in increasing-offset order, but
+	     asan_emit_stack_protection expects decreasing order (i.e. the base
+	     of the frame at offsets[length-1]).  Transform the vector so that
+	     offsets are monotonically decreasing, matching what the function
+	     expects.
+
+	     Given the current increasing-order vec
+	       [p0, d0, p1, d1, ..., p_{N-1}, d_{N-1}, prev_outer, alloc_outer]
+	     produce the decreasing-order vec
+	       [outer_end, d_{N-1}, p_{N-1}, ..., d0, p0, p0]
+	     where outer_end = alloc_outer + redzonesz.  The frame-pointer
+	     boundary p0 is repeated so that the first loop iteration
+	     (which would cover the non-existent left outer redzone) emits
+	     nothing.  Also reverse asan_decl_vec to match.  */
+	  if (!FRAME_GROWS_DOWNWARD)
+	    {
+	      HOST_WIDE_INT outer_end = offset + redzonesz;
+	      unsigned int len = data.asan_vec.length ();
+	      auto_vec<HOST_WIDE_INT> new_vec (len);
+	      new_vec.quick_push (outer_end);
+	      /* Reversed variable pairs: (data_end_i, prev_i) from last to first.  */
+	      for (int i = (int) len - 4; i >= 0; i -= 2)
+		{
+		  new_vec.quick_push (data.asan_vec[i + 1]); /* data_end */
+		  new_vec.quick_push (data.asan_vec[i]);      /* prev (alloc_start) */
+		}
+	      /* Repeat the frame-pointer boundary so the first loop iteration
+		 (covering the absent left outer redzone) emits nothing.  */
+	      new_vec.quick_push (data.asan_vec[0]);
+	      data.asan_vec.truncate (0);
+	      data.asan_vec.splice (new_vec);
+	      data.asan_decl_vec.reverse ();
+	    }
+
 	  var_end_seq
 	    = asan_emit_stack_protection (virtual_stack_vars_rtx,
 					  data.asan_base,
