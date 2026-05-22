@@ -5739,9 +5739,9 @@ c_decl_attributes (tree *node, tree attributes, int flags)
   if (last_decl == error_mark_node)
     last_decl = NULL_TREE;
   tree attr = decl_attributes (node, attributes, flags, last_decl);
-  if (VAR_P (*node) && DECL_THREAD_LOCAL_P (*node))
+  if (VAR_P (*node) && DECL_THREAD_LOCAL_P (*node)
+      && !lookup_attribute ("tls_model", DECL_ATTRIBUTES (*node)))
     {
-      // tls_model attribute can set a stronger TLS access model.
       tls_model model = DECL_TLS_MODEL (*node);
       tls_model default_model = decl_default_tls_model (*node);
       if (default_model > model)
