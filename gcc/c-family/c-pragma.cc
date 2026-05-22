@@ -270,6 +270,19 @@ apply_pragma_weak (tree decl, tree value)
 	     "results in unspecified behavior", decl);
 
   declare_weak (decl);
+
+  /* After making the symbol weak, binds_local_p may return false even for
+     hidden symbols (undefined weak symbols are never local).  Recompute the
+     TLS model so we don't use local-exec for a symbol that might be
+     undefined.  */
+  if (VAR_P (decl) && DECL_THREAD_LOCAL_P (decl)
+      && !lookup_attribute ("tls_model", DECL_ATTRIBUTES (decl)))
+    {
+      tls_model model = DECL_TLS_MODEL (decl);
+      tls_model new_model = decl_default_tls_model (decl);
+      if (new_model < model)
+	set_decl_tls_model (decl, new_model);
+    }
 }
 
 void
