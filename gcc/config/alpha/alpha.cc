@@ -10834,6 +10834,33 @@ alpha_c_mode_for_floating_type (enum tree_index ti)
 #undef TARGET_C_MODE_FOR_FLOATING_TYPE
 #define TARGET_C_MODE_FOR_FLOATING_TYPE alpha_c_mode_for_floating_type
 
+static unsigned HOST_WIDE_INT
+alpha_asan_shadow_offset (void)
+{
+  /* Alpha uses a fixed shadow offset of 0x10000000000 (1 TiB).
+     Linux caps user virtual addresses at TASK_SIZE = 0x40000000000 (4 TiB,
+     42-bit).  The layout within that VAS:
+       LowMem:    [0x000000000000, 0x00FFFFFFFFFF]  (1 TiB)
+       LowShadow: [0x010000000000, 0x011FFFFFFFFF]  (128 GiB)
+       ShadowGap: [0x012000000000, 0x012FFFFFFFFF]
+       HighShadow:[0x013000000000, 0x017FFFFFFFFF]  (256 GiB)
+       HighMem:   [0x018000000000, 0x03FFFFFFFFFF]  (2.5 TiB, stack near top)
+     Matches ASAN_SHADOW_OFFSET_CONST in libsanitizer/asan/asan_mapping.h.  */
+  return 0x10000000000ULL;
+}
+
+static bool
+alpha_asan_dynamic_shadow_offset_p (void)
+{
+  return false;
+}
+
+#undef TARGET_ASAN_SHADOW_OFFSET
+#define TARGET_ASAN_SHADOW_OFFSET alpha_asan_shadow_offset
+
+#undef TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P
+#define TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P alpha_asan_dynamic_shadow_offset_p
+
 struct gcc_target targetm = TARGET_INITIALIZER;
 
 
